@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Frontend (Next.js)
+  frontend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://backend:5000/api
+    depends_on:
+      - backend
+    networks:
+      - trustnet-network
+
+  # Backend (Node.js + Express)
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/trustnet
+      - PORT=5000
+    depends_on:
+      - mongodb
+    networks:
+      - trustnet-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # Database (MongoDB)
+  mongodb:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=trustnet
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - trustnet-network
+
+  # ML Training (Python)
+  ml-trainer:
+    build: ./ml-training
+    volumes:
+      - ./ml-training:/app
+      - ./trustnet/public/models:/app/models/tfjs
+    environment:
+      - PYTHONPATH=/app
+    networks:
+      - trustnet-network
+    profiles:
+      - training
+
+networks:
+  trustnet-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

@@ -1,0 +1,20 @@
+# TrustNet Complete Backend Requirements
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Data Processing
+numpy==1.24.3
+pandas==2.0.3
+
+# Validation
+pydantic==2.5.0
+
+# QR Code Support (Optional - will work without these)
+pyzbar==0.1.9
+Pillow==10.1.0
+
+# Additional ML Libraries (Optional)
+scikit-learn==1.3.2

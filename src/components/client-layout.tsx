@@ -4,47 +4,38 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Preloader } from "./preloader"
 import { CustomCursor } from "./custom-cursor"
-import { SmoothScroll } from "@/lib/smooth-scroll"
 import { ScrollAnimations } from "@/lib/scroll-animations"
-import { initializeAnimations, animatePageLoad, refreshAnimations } from "@/lib/init-animations"
+import { initLenisScroll, destroyLenisScroll } from "@/lib/lenis-scroll"
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [showContent, setShowContent] = useState(false)
 
   useEffect(() => {
-    // Initialize animations immediately
-    initializeAnimations()
+    // Show content immediately to prevent blank pages
+    setShowContent(true)
     
-    // Perfect timing: 4 seconds for preloader
+    // Shorter preloader for better UX
     const preloaderTimer = setTimeout(() => {
       setIsLoading(false)
       
-      // Seamless transition delay
-      setTimeout(() => {
-        setShowContent(true)
+      // Initialize smooth scrolling after preloader
+      requestAnimationFrame(() => {
+        // Enable native smooth scrolling (no custom engine to prevent issues)
+        if (typeof window !== 'undefined') {
+          document.documentElement.style.scrollBehavior = 'smooth'
+        }
         
-        // Initialize smooth scroll and animations with perfect timing
-        requestAnimationFrame(() => {
-          SmoothScroll.initialize()
-          
-          // Small delay for smooth initialization
-          setTimeout(() => {
-            ScrollAnimations.initAll()
-            animatePageLoad()
-            
-            // Final refresh for perfect alignment
-            setTimeout(() => {
-              refreshAnimations()
-            }, 500)
-          }, 100)
-        })
-      }, 800) // Longer delay for smoother transition
-    }, 4000)
+        // Initialize animations after content is visible
+        setTimeout(() => {
+          ScrollAnimations.initAll()
+          ScrollAnimations.refresh()
+        }, 200)
+      })
+    }, 1500) // Reduced to 1.5s
 
     return () => {
       clearTimeout(preloaderTimer)
-      SmoothScroll.destroy()
       ScrollAnimations.cleanup()
     }
   }, [])
@@ -57,21 +48,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       
       <CustomCursor />
       
-      <AnimatePresence mode="wait">
-        {showContent && (
-          <motion.div
-            key="content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2,
-              ease: [0.43, 0.13, 0.23, 0.96] // Custom easing for smoothness
-            }}
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Show content immediately, no animation wrapper to prevent blank screens */}
+      {showContent && children}
     </>
   )
 }

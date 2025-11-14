@@ -7,13 +7,9 @@ export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    // Check if device has mouse (not touch-only)
-    const hasMousePointer = window.matchMedia('(pointer: fine)').matches
-    if (!hasMousePointer) return
-
-    setIsVisible(true)
+    // Disabled custom cursor to prevent stuck behavior
+    // Native cursor is more reliable
+    return
 
     // Create cursor elements with enhanced structure
     const cursor = document.createElement('div')

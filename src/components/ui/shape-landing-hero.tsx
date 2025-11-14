@@ -86,10 +86,10 @@ function HeroGeometric({
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 z-0">
+    <div className="relative w-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 z-0 py-32 md:py-40">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.05] via-transparent to-indigo-500/[0.05] blur-3xl z-0" />
       
-      <div className="absolute inset-0 overflow-hidden z-0">
+      <div className="absolute inset-0 z-0">
         <ElegantShape
           delay={0.3}
           width={600}

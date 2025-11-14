@@ -20,22 +20,60 @@
   --ring: #2563eb;
 }
 
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  scroll-padding-top: 80px;
+  height: 100%;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-}
-
-html {
-  scroll-behavior: auto; /* Lenis handles smooth scrolling */
+  overscroll-behavior-y: none;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100%;
+  cursor: auto;
 }
 
+/* Ensure cursor is visible everywhere */
+*, *::before, *::after {
+  cursor: inherit;
+}
+
+/* Interactive elements */
+a, button, input, textarea, select {
+  cursor: pointer;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  cursor: text;
+}
+
+/* Smooth scrolling for all browsers */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Ensure content is always visible */
+main {
+  min-height: 100vh;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Optimize scroll performance */
 html.lenis {
   height: auto;
 }
 
 html.lenis.lenis-smooth {
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
 }
 
 html.lenis.lenis-smooth [data-lenis-prevent] {
@@ -249,40 +287,28 @@ img, video {
   background: linear-gradient(180deg, #1d4ed8, #6d28d9);
 }
 
-/* Prevent layout shift during animations - elements start hidden */
+/* Elements are visible by default - animations handle opacity */
 [data-fade-scale],
-[data-slide-left],
-[data-slide-right],
-[data-blur-fade],
-[data-text-reveal],
-[data-word-reveal],
-[data-image-reveal] {
-  opacity: 0;
-}
-
-/* Ensure animated elements are visible after animation */
-[data-fade-scale].animated,
-[data-slide-left].animated,
-[data-slide-right].animated,
-[data-blur-fade].animated,
-[data-text-reveal].animated,
-[data-word-reveal].animated,
-[data-image-reveal].animated {
+[data-card],
+[data-cards-stagger] {
   opacity: 1;
 }
 
 /* Performance optimization for mobile */
 @media (max-width: 768px) {
-  [data-parallax] {
-    transform: none !important;
+  /* Disable complex animations on mobile */
+  [data-fade-scale] {
+    animation-duration: 0.3s !important;
   }
   
-  [data-magnetic] {
-    transform: none !important;
+  [data-cards-stagger] [data-card] {
+    animation-duration: 0.3s !important;
   }
   
-  [data-blur-fade] {
-    filter: none !important;
+  /* Reduce motion on mobile for better performance */
+  * {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
   }
 }
 
@@ -549,37 +575,18 @@ input:focus, textarea:focus, select:focus {
   transform: scale(1.01);
 }
 
-/* Perfect page load animation */
-@keyframes pageLoad {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Instant page load - no animation to prevent blank screen */
 main {
-  animation: pageLoad 1.2s cubic-bezier(0.43, 0.13, 0.23, 0.96) forwards;
+  opacity: 1;
+  transform: translateY(0);
 }
 
-/* Hero elements start hidden for perfect animation */
+/* Hero elements are visible by default */
 [data-hero-badge],
 [data-hero-title],
 [data-hero-subtitle],
 [data-hero-card],
 [data-hero-feature] {
-  opacity: 0;
-}
-
-/* After animation, ensure visibility */
-[data-hero-badge].animated,
-[data-hero-title].animated,
-[data-hero-subtitle].animated,
-[data-hero-card].animated,
-[data-hero-feature].animated {
   opacity: 1;
 }
 
@@ -722,4 +729,341 @@ dialog[open] {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+
+/* ========================================
+   WIX-STYLE SMOOTH SCROLLING
+   ======================================== */
+
+/* Lenis smooth scroll setup */
+html.lenis {
+  height: auto;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Selective hardware acceleration (only for animated elements) */
+[data-fade-scale],
+[data-fade-in],
+[data-slide-left],
+[data-slide-right],
+[data-card],
+section {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Optimize scroll performance */
+section, div[class*="section"] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Smooth scroll container */
+main {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent scroll jank */
+img, video, iframe {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize animations */
+[data-fade-scale],
+[data-fade-in],
+[data-slide-left],
+[data-slide-right],
+[data-card] {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* Prevent layout shift */
+.container {
+  contain: layout style paint;
+}
+
+/* Optimize scroll triggers */
+[data-parallax] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Smooth scroll snap (optional) */
+.scroll-snap-container {
+  scroll-snap-type: y proximity;
+  scroll-padding-top: 80px;
+}
+
+.scroll-snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}
+
+
+/* ========================================
+   CURSOR VISIBILITY FIX - COMPREHENSIVE
+   ======================================== */
+
+/* Force cursor visibility on all elements */
+html, body, div, section, main, header, footer, nav, article, aside {
+  cursor: auto !important;
+}
+
+/* All elements inherit cursor */
+* {
+  cursor: inherit !important;
+}
+
+/* Override any pointer-events that might disable cursor */
+* {
+  pointer-events: auto !important;
+}
+
+/* Interactive elements get pointer cursor */
+a, 
+button, 
+[role="button"], 
+[data-magnetic], 
+[data-card],
+.btn,
+.button,
+[onclick],
+label[for] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Text inputs get text cursor */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+textarea {
+  cursor: text !important;
+  pointer-events: auto !important;
+}
+
+/* Select elements */
+select {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Disabled elements */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure no element hides cursor */
+.custom-cursor-container,
+.magnetic-cursor {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Fix for overlays and modals */
+.modal,
+.overlay,
+.backdrop,
+[role="dialog"] {
+  cursor: auto !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for SVG elements */
+svg, svg * {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for images */
+img {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for canvas elements */
+canvas {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for iframes */
+iframe {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Draggable elements */
+[draggable="true"] {
+  cursor: move !important;
+  pointer-events: auto !important;
+}
+
+/* Resizable elements */
+[resize] {
+  cursor: nwse-resize !important;
+  pointer-events: auto !important;
+}
+
+
+/* ========================================
+   ADDITIONAL CURSOR FIXES
+   ======================================== */
+
+/* Fix for absolutely positioned elements */
+[style*="position: absolute"],
+[style*="position: fixed"] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for z-index elements */
+[style*="z-index"] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for transform elements */
+[style*="transform"] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for opacity elements */
+[style*="opacity"] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Framer Motion elements */
+[data-framer-component],
+[data-framer-name] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* GSAP animated elements */
+[data-gsap],
+[data-scroll-trigger] {
+  cursor: inherit !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure cursor works on all interactive states */
+a:hover,
+a:focus,
+a:active,
+button:hover,
+button:focus,
+button:active {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for loading states */
+.loading,
+[aria-busy="true"] {
+  cursor: wait !important;
+  pointer-events: auto !important;
+}
+
+/* Fix for readonly inputs */
+input[readonly],
+textarea[readonly] {
+  cursor: default !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure cursor on all Tailwind utility classes */
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.cursor-default {
+  cursor: default !important;
+}
+
+.cursor-text {
+  cursor: text !important;
+}
+
+.cursor-move {
+  cursor: move !important;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+.cursor-wait {
+  cursor: wait !important;
+}
+
+/* Override any user-select that might affect cursor */
+* {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+/* But keep text selectable */
+p, span, div, h1, h2, h3, h4, h5, h6, li, td, th {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }

@@ -11,124 +11,103 @@ export class GSAPAnimations {
   static initializeGlobalAnimations() {
     if (typeof window === 'undefined') return
 
-    // Smooth cursor follow effect
-    this.initMagneticCursor()
+    // Configure GSAP for optimal performance
+    gsap.config({
+      force3D: true,
+      nullTargetWarn: false
+    })
+
+    // Configure ScrollTrigger for smooth scrolling
+    ScrollTrigger.config({
+      autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
+      ignoreMobileResize: true,
+      limitCallbacks: true
+    })
+
+    // Smooth cursor follow effect (non-blocking)
+    requestAnimationFrame(() => {
+      this.initMagneticCursor()
+    })
     
-    // Global scroll animations
-    this.initScrollAnimations()
+    // Global scroll animations (lightweight)
+    setTimeout(() => {
+      this.initScrollAnimations()
+    }, 100)
     
-    // Floating elements
-    this.initFloatingAnimations()
+    // Floating elements (low priority)
+    setTimeout(() => {
+      this.initFloatingAnimations()
+    }, 200)
   }
 
   static initMagneticCursor() {
-    const cursor = document.createElement('div')
-    cursor.className = 'magnetic-cursor'
-    cursor.innerHTML = '<div class="cursor-dot"></div>'
-    document.body.appendChild(cursor)
-
-    const cursorDot = cursor.querySelector('.cursor-dot') as HTMLElement
-
-    let mouseX = 0
-    let mouseY = 0
-    let cursorX = 0
-    let cursorY = 0
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX
-      mouseY = e.clientY
-    })
-
-    gsap.ticker.add(() => {
-      cursorX += (mouseX - cursorX) * 0.1
-      cursorY += (mouseY - cursorY) * 0.1
-      
-      gsap.set(cursor, {
-        x: cursorX,
-        y: cursorY
-      })
-    })
-
-    // Magnetic effect on interactive elements
-    document.querySelectorAll('button, a, [data-magnetic]').forEach(element => {
-      element.addEventListener('mouseenter', () => {
-        gsap.to(cursorDot, {
-          scale: 2,
-          duration: 0.3,
-          ease: 'power2.out'
-        })
-      })
-
-      element.addEventListener('mouseleave', () => {
-        gsap.to(cursorDot, {
-          scale: 1,
-          duration: 0.3,
-          ease: 'power2.out'
-        })
-      })
-    })
+    // Disabled custom cursor to prevent stuck behavior
+    // Native cursor is more reliable and doesn't cause issues
+    return
   }
 
   static initScrollAnimations() {
-    // Fade in elements on scroll
+    // Fade in elements on scroll (optimized)
     gsap.utils.toArray('[data-fade-in]').forEach((element: any) => {
       gsap.fromTo(element, 
         { 
           opacity: 0, 
-          y: 50 
+          y: 30 
         },
         {
           opacity: 1,
           y: 0,
-          duration: 1,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: element,
-            start: 'top 80%',
-            end: 'bottom 20%',
-            toggleActions: 'play none none reverse'
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       )
     })
 
-    // Slide in from left
+    // Slide in from left (optimized)
     gsap.utils.toArray('[data-slide-left]').forEach((element: any) => {
       gsap.fromTo(element,
         {
           opacity: 0,
-          x: -100
+          x: -50
         },
         {
           opacity: 1,
           x: 0,
-          duration: 1.2,
-          ease: 'power3.out',
+          duration: 0.8,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: element,
             start: 'top 85%',
-            toggleActions: 'play none none reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       )
     })
 
-    // Slide in from right
+    // Slide in from right (optimized)
     gsap.utils.toArray('[data-slide-right]').forEach((element: any) => {
       gsap.fromTo(element,
         {
           opacity: 0,
-          x: 100
+          x: 50
         },
         {
           opacity: 1,
           x: 0,
-          duration: 1.2,
-          ease: 'power3.out',
+          duration: 0.8,
+          ease: 'power2.out',
           scrollTrigger: {
             trigger: element,
             start: 'top 85%',
-            toggleActions: 'play none none reverse'
+            toggleActions: 'play none none none',
+            once: true
           }
         }
       )

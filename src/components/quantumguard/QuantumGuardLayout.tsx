@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion"
 import { Shield, Sparkles, Brain, Lock } from "lucide-react"
-import { ReactNode } from "react"
+import { ReactNode, useEffect } from "react"
+import { ScrollAnimations } from "@/lib/scroll-animations"
 
 interface QuantumGuardLayoutProps {
   children: ReactNode
@@ -11,11 +12,22 @@ interface QuantumGuardLayoutProps {
 }
 
 export function QuantumGuardLayout({ children, title, description }: QuantumGuardLayoutProps) {
+  useEffect(() => {
+    // Initialize scroll animations after component mounts
+    const timer = setTimeout(() => {
+      ScrollAnimations.initAll()
+      ScrollAnimations.refresh()
+    }, 300)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [])
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Animated Background */}
+        {/* Animated Background - NO PARALLAX for better performance */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
@@ -79,8 +91,8 @@ export function QuantumGuardLayout({ children, title, description }: QuantumGuar
                 It acts like a <span className="font-semibold text-indigo-600">CIBIL score — but for online safety</span>.
               </p>
 
-              <div className="grid md:grid-cols-3 gap-6 mt-8">
-                <div className="text-left">
+              <div className="grid md:grid-cols-3 gap-6 mt-8" data-cards-stagger>
+                <div data-card className="text-left">
                   <div className="flex items-center space-x-2 mb-2">
                     <Sparkles className="w-5 h-5 text-blue-600" />
                     <h3 className="font-semibold text-gray-900">What's Unique</h3>
@@ -90,7 +102,7 @@ export function QuantumGuardLayout({ children, title, description }: QuantumGuar
                   </p>
                 </div>
 
-                <div className="text-left">
+                <div data-card className="text-left">
                   <div className="flex items-center space-x-2 mb-2">
                     <Shield className="w-5 h-5 text-indigo-600" />
                     <h3 className="font-semibold text-gray-900">What You Get</h3>
@@ -100,7 +112,7 @@ export function QuantumGuardLayout({ children, title, description }: QuantumGuar
                   </p>
                 </div>
 
-                <div className="text-left">
+                <div data-card className="text-left">
                   <div className="flex items-center space-x-2 mb-2">
                     <Lock className="w-5 h-5 text-purple-600" />
                     <h3 className="font-semibold text-gray-900">Why Advanced</h3>

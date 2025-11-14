@@ -174,7 +174,7 @@ export default function MessageAnalyzerPage() {
           className="max-w-4xl mx-auto"
         >
           {/* Input Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
+          <div data-fade-scale className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Paste Message to Analyze</h3>
             <p className="text-gray-600 mb-6">
               Our AI will detect psychological manipulation, scam patterns, and social engineering tactics
@@ -186,6 +186,28 @@ export default function MessageAnalyzerPage() {
               placeholder="Paste WhatsApp message, SMS, or any suspicious text here..."
               className="w-full h-48 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
+
+            {/* Example Buttons */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={() => setMessage("Hi! Your order #12345 has been shipped and will arrive tomorrow. Track your package at our official website. Thank you for shopping with us!")}
+                className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                ✅ Try Real Message
+              </button>
+              <button
+                onClick={() => setMessage("URGENT! Your bank account has been suspended due to suspicious activity. Click this link immediately to verify your identity or your account will be permanently blocked: http://fake-bank-verify.xyz Call us now at 9876543210")}
+                className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              >
+                ❌ Try Scam Message
+              </button>
+              <button
+                onClick={() => setMessage("Congratulations! You have won a lottery of Rs 25,00,000! Claim your prize now by calling this number immediately. Limited time offer. Don't miss this opportunity!")}
+                className="px-4 py-2 text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+              >
+                ⚠️ Try Lottery Scam
+              </button>
+            </div>
 
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4 mb-6">
               <p className="text-sm text-yellow-800">
@@ -219,9 +241,10 @@ export default function MessageAnalyzerPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="space-y-6"
+              data-cards-stagger
             >
               {/* Scam Probability */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="text-center mb-6">
                   <div className="flex justify-center mb-4">
                     <div className={`p-4 rounded-full ${
@@ -273,7 +296,7 @@ export default function MessageAnalyzerPage() {
 
               {/* Detected Tactics */}
               {result.detectedTactics.length > 0 && (
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
+                <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
                   <div className="flex items-center space-x-2 mb-6">
                     <Brain className="w-6 h-6 text-orange-600" />
                     <h4 className="text-xl font-bold text-gray-900">Manipulation Tactics Detected</h4>
@@ -301,7 +324,7 @@ export default function MessageAnalyzerPage() {
               )}
 
               {/* Psychology Analysis */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="flex items-center space-x-2 mb-6">
                   <Zap className="w-6 h-6 text-blue-600" />
                   <h4 className="text-xl font-bold text-gray-900">Psychological Manipulation Analysis</h4>
@@ -336,7 +359,7 @@ export default function MessageAnalyzerPage() {
               </div>
 
               {/* Recommendations */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="flex items-center space-x-2 mb-6">
                   <Shield className="w-6 h-6 text-blue-600" />
                   <h4 className="text-xl font-bold text-gray-900">Safety Recommendations</h4>

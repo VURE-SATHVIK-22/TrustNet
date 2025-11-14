@@ -34,25 +34,50 @@ export default function IdentityCheckerPage() {
     if (email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       const isValid = emailRegex.test(email)
-      const hasSuspiciousDomain = /\.(xyz|tk|ml|ga|cf)$/.test(email)
-      const hasNumbers = /\d{4,}/.test(email)
       
-      let risk = 20
+      // Legitimate email domains
+      const legitimateDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'protonmail.com', 'aol.com', 'mail.com', 'zoho.com', 'yandex.com']
+      const emailDomain = email.split('@')[1]?.toLowerCase() || ''
+      const isLegitDomain = legitimateDomains.includes(emailDomain)
+      
+      const hasSuspiciousDomain = /\.(xyz|tk|ml|ga|cf|pw|top|click|download|loan|win|bid)$/i.test(email)
+      const hasNumbers = /\d{6,}/.test(email.split('@')[0]) // 6+ consecutive numbers in username
+      const hasRandomPattern = /^[a-z0-9]{15,}@/.test(email) // Very long random username
+      const hasMultipleDots = (email.split('@')[0].match(/\./g) || []).length > 2
+      
+      let risk = 10
       const warnings: string[] = []
       const recommendations: string[] = []
 
       if (!isValid) {
-        risk += 40
+        risk += 50
         warnings.push('Invalid email format detected')
       }
+      
+      if (isLegitDomain) {
+        risk = Math.max(5, risk - 10)
+        recommendations.push('Email uses trusted provider')
+      }
+      
       if (hasSuspiciousDomain) {
-        risk += 30
-        warnings.push('Email uses suspicious domain extension')
+        risk += 40
+        warnings.push('Email uses high-risk domain extension')
         recommendations.push('Verify sender through alternative channels')
       }
+      
       if (hasNumbers) {
-        risk += 10
-        warnings.push('Email contains unusual number patterns')
+        risk += 20
+        warnings.push('Username contains excessive numbers (possible bot account)')
+      }
+      
+      if (hasRandomPattern) {
+        risk += 25
+        warnings.push('Username appears randomly generated')
+      }
+      
+      if (hasMultipleDots) {
+        risk += 15
+        warnings.push('Unusual dot pattern in username')
       }
 
       identityResult = {
@@ -140,7 +165,7 @@ export default function IdentityCheckerPage() {
           className="max-w-4xl mx-auto"
         >
           {/* Input Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
+          <div data-fade-scale className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Enter Identity to Check</h3>
             
             <div className="space-y-6">
@@ -161,6 +186,28 @@ export default function IdentityCheckerPage() {
                   placeholder="example@domain.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setEmail("support@company.com")
+                      setPhone("")
+                      setUsername("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                  >
+                    ✅ Try Real Email
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEmail("user123456@randomdomain.tk")
+                      setPhone("")
+                      setUsername("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  >
+                    ❌ Try Fake Email
+                  </button>
+                </div>
               </div>
 
               <div className="text-center text-gray-500 font-medium">OR</div>
@@ -182,6 +229,28 @@ export default function IdentityCheckerPage() {
                   placeholder="+1 234 567 8900"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setPhone("+1 234 567 8900")
+                      setEmail("")
+                      setUsername("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                  >
+                    ✅ Try Real Phone
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPhone("9876543210")
+                      setEmail("")
+                      setUsername("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+                  >
+                    ⚠️ Try Without Country Code
+                  </button>
+                </div>
               </div>
 
               <div className="text-center text-gray-500 font-medium">OR</div>
@@ -203,6 +272,28 @@ export default function IdentityCheckerPage() {
                   placeholder="@username"
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setUsername("@john_doe")
+                      setEmail("")
+                      setPhone("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                  >
+                    ✅ Try Real Username
+                  </button>
+                  <button
+                    onClick={() => {
+                      setUsername("@user123456789")
+                      setEmail("")
+                      setPhone("")
+                    }}
+                    className="px-3 py-1.5 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  >
+                    ❌ Try Bot Username
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -232,9 +323,10 @@ export default function IdentityCheckerPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="space-y-6"
+              data-cards-stagger
             >
               {/* Risk Assessment */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-3">
                     {result.type === 'email' && <Mail className="w-8 h-8 text-blue-600" />}
@@ -300,7 +392,7 @@ export default function IdentityCheckerPage() {
 
               {/* Warnings */}
               {result.warnings.length > 0 && (
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
+                <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
                   <div className="flex items-center space-x-2 mb-4">
                     <AlertTriangle className="w-6 h-6 text-orange-600" />
                     <h4 className="text-xl font-bold text-gray-900">Security Warnings</h4>
@@ -323,7 +415,7 @@ export default function IdentityCheckerPage() {
               )}
 
               {/* Recommendations */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="flex items-center space-x-2 mb-4">
                   <Shield className="w-6 h-6 text-blue-600" />
                   <h4 className="text-xl font-bold text-gray-900">Recommendations</h4>

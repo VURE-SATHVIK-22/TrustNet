@@ -314,21 +314,22 @@ const AdvancedLogo = ({ scrolled }: { scrolled: boolean }) => {
       {/* Dynamic Text Logo */}
       <div className="flex flex-col">
         <motion.span 
-          className="text-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent font-encode-sans font-bold"
+          className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
           animate={{
             rotateX: mousePosition.y * 0.5,
             rotateY: mousePosition.x * 0.5,
           }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          style={{ transformStyle: "preserve-3d" }}
+          style={{ transformStyle: "preserve-3d", fontFamily: 'system-ui, -apple-system, sans-serif' }}
         >
           TrustNet
         </motion.span>
         <motion.span 
-          className="text-xs text-gray-500 -mt-1 font-quintessential"
+          className="text-xs text-gray-500 -mt-1"
           animate={{
             opacity: scrolled ? 0.7 : 1,
           }}
+          style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
         >
           Know Before You Click
         </motion.span>
@@ -546,20 +547,20 @@ export function Navbar() {
       {/* Scroll Progress Bar */}
       <motion.div
         ref={progressRef}
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 z-[10000] origin-left"
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 z-[51] origin-left pointer-events-none"
         style={{ scaleX: scrollProgress / 100 }}
       />
 
       <nav
         ref={navRef}
-        className={`fixed top-0 z-[9999] w-full transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ${
           scrolled 
-            ? 'bg-white/90 backdrop-blur-xl shadow-2xl border-b border-white/20' 
-            : 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100'
+            ? 'bg-white/95 backdrop-blur-xl shadow-2xl border-b border-white/20' 
+            : 'bg-white/98 backdrop-blur-md shadow-lg border-b border-gray-100'
         }`}
       >
         {/* Animated gradient border */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex h-20 items-center justify-between">

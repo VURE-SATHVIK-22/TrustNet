@@ -32,7 +32,20 @@ export default function UPIScannerPage() {
     const isValid = upiRegex.test(upiId)
     
     const issues: UPIResult['issues'] = []
-    let trustScore = 70
+    let trustScore = 50
+    
+    // Comprehensive list of known legitimate UPI providers
+    const knownProviders = [
+      'paytm', 'ptm', 'phonepe', 'ybl', 'ibl', 'axl',
+      'gpay', 'googlepay', 'okaxis', 'oksbi', 'okicici', 'okhdfc',
+      'upi', 'sbi', 'icici', 'hdfc', 'axis', 'kotak', 'pnb', 'bob',
+      'federal', 'indus', 'yes', 'idbi', 'union', 'canara', 'boi',
+      'airtel', 'jio', 'freecharge', 'mobikwik', 'amazon', 'whatsapp'
+    ]
+    
+    const bankPart = upiId.split('@')[1]?.toLowerCase() || ''
+    const userPart = upiId.split('@')[0]?.toLowerCase() || ''
+    const isKnownProvider = knownProviders.some(provider => bankPart.includes(provider))
     
     // Check for common issues
     if (!isValid) {
@@ -41,17 +54,51 @@ export default function UPIScannerPage() {
         severity: 'high',
         description: 'UPI ID does not follow standard format (username@bank)'
       })
-      trustScore -= 40
-    }
-
-    const hasNumbers = /\d{6,}/.test(upiId)
-    if (hasNumbers) {
+      trustScore = 15
+    } else if (isKnownProvider) {
+      // Known provider - start with high score
+      trustScore = 85
+      
+      // Check for suspicious patterns in username
+      const hasExcessiveNumbers = /\d{8,}/.test(userPart)
+      const hasRandomPattern = /^[a-z0-9]{15,}$/.test(userPart) && !/[aeiou]{2}/.test(userPart)
+      
+      if (hasExcessiveNumbers) {
+        issues.push({
+          type: 'Suspicious Pattern',
+          severity: 'medium',
+          description: 'Username contains very long number sequence'
+        })
+        trustScore -= 15
+      }
+      
+      if (hasRandomPattern) {
+        issues.push({
+          type: 'Random Username',
+          severity: 'low',
+          description: 'Username appears randomly generated'
+        })
+        trustScore -= 10
+      }
+    } else {
+      // Unknown provider
+      trustScore = 35
       issues.push({
-        type: 'Suspicious Pattern',
-        severity: 'medium',
-        description: 'Contains long number sequences which may indicate auto-generated account'
+        type: 'Unknown Provider',
+        severity: 'high',
+        description: 'Payment provider not recognized - high risk of fraud'
       })
-      trustScore -= 15
+      
+      // Check for suspicious TLDs in provider
+      const hasSuspiciousTLD = /\.(xyz|tk|ml|ga|cf|pw|top|click)$/i.test(bankPart)
+      if (hasSuspiciousTLD) {
+        issues.push({
+          type: 'Suspicious Domain',
+          severity: 'high',
+          description: 'Provider uses high-risk domain extension'
+        })
+        trustScore -= 20
+      }
     }
 
     const hasSpecialChars = /[^a-zA-Z0-9@._-]/.test(upiId)
@@ -61,20 +108,7 @@ export default function UPIScannerPage() {
         severity: 'medium',
         description: 'Contains unusual special characters'
       })
-      trustScore -= 10
-    }
-
-    const knownBanks = ['paytm', 'phonepe', 'gpay', 'googlepay', 'okaxis', 'oksbi', 'okicici', 'okhdfc', 'ybl', 'ibl', 'axl']
-    const bankPart = upiId.split('@')[1]?.toLowerCase() || ''
-    const isKnownBank = knownBanks.some(bank => bankPart.includes(bank))
-    
-    if (!isKnownBank && isValid) {
-      issues.push({
-        type: 'Unknown Provider',
-        severity: 'low',
-        description: 'Payment provider not recognized - verify before proceeding'
-      })
-      trustScore -= 5
+      trustScore -= 15
     }
 
     trustScore = Math.max(0, Math.min(100, trustScore))
@@ -125,7 +159,7 @@ export default function UPIScannerPage() {
           className="max-w-4xl mx-auto"
         >
           {/* Input Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
+          <div data-fade-scale className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Enter UPI ID to Verify</h3>
             <p className="text-gray-600 mb-6">
               Check any UPI ID for formatting issues, suspicious patterns, and trust indicators
@@ -140,6 +174,34 @@ export default function UPIScannerPage() {
                 placeholder="username@paytm, 9876543210@ybl, merchant@okaxis"
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+            </div>
+
+            {/* Example Buttons */}
+            <div className="mb-4 flex flex-wrap gap-2">
+              <button
+                onClick={() => setUpiId("merchant@paytm")}
+                className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                ✅ Try Real UPI (Paytm)
+              </button>
+              <button
+                onClick={() => setUpiId("user@ybl")}
+                className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                ✅ Try Real UPI (PhonePe)
+              </button>
+              <button
+                onClick={() => setUpiId("user123456789@unknownbank")}
+                className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              >
+                ❌ Try Fake UPI
+              </button>
+              <button
+                onClick={() => setUpiId("suspicious@xyz")}
+                className="px-4 py-2 text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+              >
+                ⚠️ Try Suspicious UPI
+              </button>
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -174,9 +236,10 @@ export default function UPIScannerPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="space-y-6"
+              data-cards-stagger
             >
               {/* Trust Score Display */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="text-center mb-6">
                   <div className="flex justify-center mb-4">
                     {result.riskLevel === 'Safe' && <CheckCircle className="w-16 h-16 text-green-600" />}
@@ -230,7 +293,7 @@ export default function UPIScannerPage() {
 
               {/* Issues Detected */}
               {result.issues.length > 0 && (
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
+                <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-orange-100 shadow-xl">
                   <div className="flex items-center space-x-2 mb-6">
                     <AlertTriangle className="w-6 h-6 text-orange-600" />
                     <h4 className="text-xl font-bold text-gray-900">Issues Detected</h4>
@@ -266,7 +329,7 @@ export default function UPIScannerPage() {
               )}
 
               {/* Recommendations */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <div className="flex items-center space-x-2 mb-6">
                   <Shield className="w-6 h-6 text-blue-600" />
                   <h4 className="text-xl font-bold text-gray-900">Safety Recommendations</h4>

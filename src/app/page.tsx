@@ -326,7 +326,7 @@ export default function Home() {
         <QuantumGuardSection />
 
         {/* Glass Cards Feature Section */}
-        <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
+        <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative">
           {/* Background effects */}
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" data-parallax data-parallax-speed="0.3" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent" />
@@ -355,7 +355,7 @@ export default function Home() {
         </div>
         
         {/* How It Works Section */}
-        <section className="py-20 bg-gray-50 relative overflow-hidden">
+        <section className="py-20 bg-gray-50 relative">
           <div data-parallax data-parallax-speed="0.2" className="absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" />
           <div data-parallax data-parallax-speed="0.3" className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl" />
           <div className="relative z-10">

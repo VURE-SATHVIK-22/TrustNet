@@ -64,11 +64,46 @@ const uniqueFeatures = [
 export function QuantumGuardSection() {
   return (
     <section className="relative py-32 overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      {/* Animated Background - Optimized */}
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div 
+          className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{
+            duration: 5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -163,10 +198,22 @@ export function QuantumGuardSection() {
                   <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-300`} />
                   
                   {/* Card */}
-                  <div className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 h-full hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-                    <div className={`p-3 bg-gradient-to-br ${feature.gradient} rounded-xl w-fit mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <motion.div 
+                    className="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 h-full"
+                    whileHover={{ 
+                      scale: 1.03,
+                      y: -4,
+                      backgroundColor: "rgba(255, 255, 255, 0.15)"
+                    }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  >
+                    <motion.div 
+                      className={`p-3 bg-gradient-to-br ${feature.gradient} rounded-xl w-fit mb-4`}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
                       <feature.icon className="w-6 h-6 text-white" />
-                    </div>
+                    </motion.div>
                     
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-200 transition-colors">
                       {feature.title}
@@ -178,9 +225,14 @@ export function QuantumGuardSection() {
                     
                     <div className="flex items-center text-blue-300 group-hover:text-white transition-colors">
                       <span className="text-sm font-medium">Try Now</span>
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      <motion.div
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </Link>
             </motion.div>

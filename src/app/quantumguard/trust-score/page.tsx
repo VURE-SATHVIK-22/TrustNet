@@ -28,40 +28,149 @@ export default function TrustScorePage() {
     // Simulate AI analysis
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Generate trust score based on input patterns
-    const hasHttps = input.includes('https://')
-    const hasKnownDomain = /\.(com|org|edu|gov)/.test(input)
-    const hasEmail = /@/.test(input)
-    const hasPhone = /\d{10}/.test(input)
-    const hasSuspiciousChars = /[<>{}]/.test(input)
-    const length = input.length
+    // Comprehensive whitelist of legitimate domains
+    const legitimateDomains = [
+      'amazon.com', 'amazon.in', 'amazon.co.uk', 'amazon.de', 'amazon.fr', 'amazon.ca', 'amazon.au',
+      'google.com', 'google.co.in', 'google.co.uk', 'youtube.com', 'gmail.com',
+      'microsoft.com', 'office.com', 'outlook.com', 'live.com',
+      'apple.com', 'icloud.com',
+      'facebook.com', 'instagram.com', 'whatsapp.com', 'meta.com',
+      'paypal.com', 'paypal.in',
+      'github.com', 'stackoverflow.com', 'wikipedia.org',
+      'linkedin.com', 'twitter.com', 'x.com', 'reddit.com',
+      'netflix.com', 'spotify.com', 'dropbox.com',
+      'flipkart.com', 'myntra.com', 'snapdeal.com',
+      'paytm.com', 'phonepe.com', 'gpay.com',
+      'sbi.co.in', 'hdfcbank.com', 'icicibank.com', 'axisbank.com'
+    ]
+
+    // Extract domain from URL
+    let domain = input.toLowerCase().trim()
+    try {
+      if (domain.includes('://')) {
+        const url = new URL(domain)
+        domain = url.hostname.replace('www.', '')
+      } else if (domain.includes('.')) {
+        domain = domain.replace('www.', '').split('/')[0]
+      }
+    } catch (e) {
+      // Invalid URL format
+    }
+
+    // Check if it's a whitelisted legitimate domain
+    const isLegitimate = legitimateDomains.some(legitDomain => 
+      domain === legitDomain || domain.endsWith('.' + legitDomain)
+    )
 
     let score = 50
     const factors: TrustScoreResult['factors'] = []
 
-    if (hasHttps) {
-      score += 15
-      factors.push({ name: 'HTTPS Protocol', impact: 'positive', description: 'Uses secure connection' })
-    }
-    if (hasKnownDomain) {
-      score += 10
-      factors.push({ name: 'Known Domain', impact: 'positive', description: 'Recognized domain extension' })
-    }
-    if (hasSuspiciousChars) {
-      score -= 20
-      factors.push({ name: 'Suspicious Characters', impact: 'negative', description: 'Contains unusual characters' })
-    }
-    if (length > 100) {
-      score -= 10
-      factors.push({ name: 'Excessive Length', impact: 'negative', description: 'Unusually long input' })
-    }
-    if (hasEmail) {
-      score += 5
-      factors.push({ name: 'Email Format', impact: 'positive', description: 'Valid email structure' })
-    }
-    if (hasPhone) {
-      score += 5
-      factors.push({ name: 'Phone Number', impact: 'positive', description: 'Contains phone number' })
+    if (isLegitimate) {
+      // Legitimate domain - high score
+      score = 95
+      factors.push({ name: 'Verified Domain', impact: 'positive', description: 'Recognized legitimate website' })
+      
+      if (input.includes('https://')) {
+        score += 5
+        factors.push({ name: 'HTTPS Protocol', impact: 'positive', description: 'Uses secure connection' })
+      } else if (input.includes('http://')) {
+        score -= 5
+        factors.push({ name: 'HTTP Protocol', impact: 'negative', description: 'Not using secure connection' })
+      }
+    } else {
+      // Unknown domain - analyze patterns
+      const hasHttps = input.includes('https://')
+      const hasHttp = input.includes('http://')
+      const hasSuspiciousTLD = /\.(tk|ml|ga|cf|pw|xyz|top|click|download|loan|win|bid)($|\/)/i.test(input)
+      const hasSuspiciousWords = /(verify|secure|login|account|update|confirm|suspended|urgent|winner|prize|free|click)/i.test(input)
+      const hasIPAddress = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(input)
+      const hasAtSymbol = input.includes('@') && input.includes('http')
+      const hasSuspiciousChars = /[<>{}]/.test(input)
+      const hasExcessiveSubdomains = (domain.match(/\./g) || []).length > 3
+      const length = input.length
+      const hasRandomPattern = /[a-z]{10,}/.test(domain) && !/[aeiou]{2}/.test(domain) // Long strings without vowels
+      
+      // Check if domain actually exists (basic validation)
+      const hasValidTLD = /\.(com|org|net|edu|gov|in|co\.uk|de|fr|ca|au|jp|br|it|es|ru|nl|se|no|dk|fi|pl|be|at|ch|ie|nz|sg|hk|my|th|id|ph|vn|za|ae|sa|eg|ng|ke|tz|ug|gh|sn|ci|cm|bj|tg|ml|ne|bf|gn|sl|lr|gm|mw|zm|zw|bw|na|sz|ls|mg|mu|sc|re|yt|km|dj|so|et|er|sd|ss|ly|tn|dz|ma|mr|eh)($|\/)/i.test(input)
+
+      if (!hasValidTLD && domain.includes('.')) {
+        score = 20
+        factors.push({ name: 'Invalid/Unknown TLD', impact: 'negative', description: 'Domain extension not recognized or suspicious' })
+      }
+
+      if (hasRandomPattern) {
+        score -= 25
+        factors.push({ name: 'Random Domain Pattern', impact: 'negative', description: 'Domain appears randomly generated' })
+      }
+
+      if (hasHttps && !hasSuspiciousTLD) {
+        score += 10
+        factors.push({ name: 'HTTPS Protocol', impact: 'positive', description: 'Uses secure connection' })
+      } else if (!hasHttp && !hasHttps) {
+        score -= 5
+        factors.push({ name: 'No Protocol', impact: 'neutral', description: 'Protocol not specified' })
+      } else if (hasHttp) {
+        score -= 15
+        factors.push({ name: 'HTTP Protocol', impact: 'negative', description: 'Not using secure connection' })
+      }
+
+      if (hasSuspiciousTLD) {
+        score -= 30
+        factors.push({ name: 'Suspicious TLD', impact: 'negative', description: 'Uses high-risk domain extension' })
+      }
+
+      if (hasSuspiciousWords) {
+        score -= 20
+        factors.push({ name: 'Suspicious Keywords', impact: 'negative', description: 'Contains phishing-related words' })
+      }
+
+      if (hasIPAddress) {
+        score -= 25
+        factors.push({ name: 'IP Address', impact: 'negative', description: 'Uses IP address instead of domain name' })
+      }
+
+      if (hasAtSymbol) {
+        score -= 30
+        factors.push({ name: 'URL Obfuscation', impact: 'negative', description: 'Contains @ symbol for redirection' })
+      }
+
+      if (hasSuspiciousChars) {
+        score -= 20
+        factors.push({ name: 'Suspicious Characters', impact: 'negative', description: 'Contains unusual characters' })
+      }
+
+      if (hasExcessiveSubdomains) {
+        score -= 15
+        factors.push({ name: 'Excessive Subdomains', impact: 'negative', description: 'Too many subdomains detected' })
+      }
+
+      if (length > 100) {
+        score -= 10
+        factors.push({ name: 'Excessive Length', impact: 'negative', description: 'Unusually long URL' })
+      }
+
+      // Check for email format
+      if (/@/.test(input) && !input.includes('http')) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (emailRegex.test(input)) {
+          const emailDomain = input.split('@')[1]
+          const hasSuspiciousEmailDomain = /\.(tk|ml|ga|cf|pw|xyz)$/.test(emailDomain)
+          
+          if (hasSuspiciousEmailDomain) {
+            score = 30
+            factors.push({ name: 'Suspicious Email Domain', impact: 'negative', description: 'Email uses high-risk domain' })
+          } else {
+            score = 60
+            factors.push({ name: 'Email Format', impact: 'positive', description: 'Valid email structure' })
+          }
+        }
+      }
+
+      // Check for phone number
+      if (/\d{10}/.test(input) && !input.includes('http')) {
+        score = 65
+        factors.push({ name: 'Phone Number', impact: 'positive', description: 'Valid phone number format' })
+      }
     }
 
     score = Math.max(0, Math.min(100, score))
@@ -137,7 +246,7 @@ export default function TrustScorePage() {
           className="max-w-4xl mx-auto"
         >
           {/* Input Section */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
+          <div data-fade-scale className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Enter Any Digital Identity</h3>
             <p className="text-gray-600 mb-6">
               URLs, emails, phone numbers, social media usernames, UPI IDs, or any online identifier
@@ -149,6 +258,46 @@ export default function TrustScorePage() {
               placeholder="e.g., https://example.com, user@email.com, @username, 9876543210, user@upi"
               className="w-full h-32 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
+
+            {/* Example Buttons */}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                onClick={() => setInput("https://www.amazon.in")}
+                className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                ✅ Try Real (Amazon India)
+              </button>
+              <button
+                onClick={() => setInput("https://www.google.com")}
+                className="px-4 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+              >
+                ✅ Try Real (Google)
+              </button>
+              <button
+                onClick={() => setInput("http://ajavrbgjrb.in")}
+                className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              >
+                ❌ Try Fake (Random Domain)
+              </button>
+              <button
+                onClick={() => setInput("http://secure-login-verify.xyz")}
+                className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+              >
+                ❌ Try Phishing Site
+              </button>
+              <button
+                onClick={() => setInput("support@gmail.com")}
+                className="px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+              >
+                📧 Try Real Email
+              </button>
+              <button
+                onClick={() => setInput("user123456789@randomdomain.tk")}
+                className="px-4 py-2 text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+              >
+                ⚠️ Try Suspicious Email
+              </button>
+            </div>
 
             <Button
               onClick={analyzeTrustScore}
@@ -176,9 +325,10 @@ export default function TrustScorePage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
               className="space-y-6"
+              data-cards-stagger
             >
               {/* Trust Score Display */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl text-center">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl text-center">
                 <div className="flex justify-center mb-4">
                   {getRiskIcon(result.riskLevel)}
                 </div>
@@ -212,13 +362,13 @@ export default function TrustScorePage() {
               </div>
 
               {/* Explanation */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <h4 className="text-xl font-bold text-gray-900 mb-4">Analysis Explanation</h4>
                 <p className="text-gray-700 leading-relaxed">{result.explanation}</p>
               </div>
 
               {/* Risk Factors */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
+              <div data-card className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-blue-100 shadow-xl">
                 <h4 className="text-xl font-bold text-gray-900 mb-6">Trust Factors Analyzed</h4>
                 <div className="space-y-4">
                   {result.factors.map((factor, index) => (

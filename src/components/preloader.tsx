@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { TextRoll } from "@/components/ui/text-roll"
 
 export function Preloader() {
   const [isLoading, setIsLoading] = useState(true)
@@ -219,33 +220,27 @@ export function Preloader() {
                       />
                     </g>
 
-                    {/* TrustNet Text - Perfect spacing */}
-                    <motion.text
-                      x="340"
-                      y="310"
-                      fill="#e0e7ff"
-                      fontSize="90"
-                      fontWeight="400"
-                      fontFamily="Arial, sans-serif"
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 1, delay: 1.8 }}
-                    >
-                      Trust
-                    </motion.text>
-                    <motion.text
-                      x="550"
-                      y="310"
-                      fill="#60a5fa"
-                      fontSize="90"
-                      fontWeight="400"
-                      fontFamily="Arial, sans-serif"
-                      initial={{ opacity: 0, x: -30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 1, delay: 2 }}
-                    >
-                      Net
-                    </motion.text>
+                    {/* TrustNet Text with TextRoll Animation */}
+                    <foreignObject x="340" y="240" width="400" height="120">
+                      <div className="flex items-center justify-start h-full">
+                        <TextRoll 
+                          className="text-[90px] font-normal text-[#e0e7ff]"
+                          duration={0.4}
+                          getEnterDelay={(i) => 1.8 + i * 0.08}
+                          getExitDelay={(i) => 2.0 + i * 0.08}
+                        >
+                          Trust
+                        </TextRoll>
+                        <TextRoll 
+                          className="text-[90px] font-normal text-[#60a5fa] ml-2"
+                          duration={0.4}
+                          getEnterDelay={(i) => 2.2 + i * 0.08}
+                          getExitDelay={(i) => 2.4 + i * 0.08}
+                        >
+                          Net
+                        </TextRoll>
+                      </div>
+                    </foreignObject>
 
                     {/* Gradients */}
                     <defs>

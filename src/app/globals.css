@@ -27,26 +27,33 @@ body {
 
 html {
   scroll-behavior: auto; /* Lenis handles smooth scrolling */
+  overflow-x: hidden;
 }
 
 html.lenis {
   height: auto;
 }
 
-.lenis.lenis-smooth {
+html.lenis.lenis-smooth {
   scroll-behavior: auto;
 }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
+html.lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
 
-.lenis.lenis-stopped {
+html.lenis.lenis-stopped {
   overflow: hidden;
 }
 
-.lenis.lenis-scrolling iframe {
+html.lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Ensure body is ready for smooth scroll */
+body {
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 /* Performance optimizations */
@@ -242,12 +249,26 @@ img, video {
   background: linear-gradient(180deg, #1d4ed8, #6d28d9);
 }
 
-/* Prevent layout shift during animations */
+/* Prevent layout shift during animations - elements start hidden */
 [data-fade-scale],
 [data-slide-left],
 [data-slide-right],
-[data-blur-fade] {
+[data-blur-fade],
+[data-text-reveal],
+[data-word-reveal],
+[data-image-reveal] {
   opacity: 0;
+}
+
+/* Ensure animated elements are visible after animation */
+[data-fade-scale].animated,
+[data-slide-left].animated,
+[data-slide-right].animated,
+[data-blur-fade].animated,
+[data-text-reveal].animated,
+[data-word-reveal].animated,
+[data-image-reveal].animated {
+  opacity: 1;
 }
 
 /* Performance optimization for mobile */
@@ -346,26 +367,36 @@ img, video {
 }
 
 
-/* ===== CUSTOM CURSOR ===== */
-.custom-cursor {
+/* ===== ENHANCED CUSTOM CURSOR ===== */
+.custom-cursor-container {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
   z-index: 99999;
-  mix-blend-mode: difference;
+  will-change: transform;
 }
 
+/* Cursor Dot */
 .cursor-dot {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #2563eb;
-  border-radius: 50%;
+  width: 10px;
+  height: 10px;
   transform: translate(-50%, -50%);
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  will-change: transform;
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.5));
 }
 
+.cursor-dot-inner {
+  width: 100%;
+  height: 100%;
+  background: #2563eb;
+  border-radius: 50%;
+  transition: background-color 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+              transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Cursor Ring */
 .cursor-ring {
   position: absolute;
   width: 40px;
@@ -373,27 +404,322 @@ img, video {
   border: 2px solid #94a3b8;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: border-color 0.3s ease, transform 0.3s ease;
+  transition: border-color 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+              border-width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+/* Cursor Ring Glow */
+.cursor-ring-glow {
+  position: absolute;
+  inset: -4px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform, opacity;
+}
+
+/* Cursor Trail */
+.cursor-trail {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0.15;
+  transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+  filter: blur(8px);
+}
+
+/* Hover States */
+.cursor-dot:hover .cursor-dot-inner {
+  transform: scale(1.2);
+}
+
+/* Click Animation */
+@keyframes cursorClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Pulse Animation for Interactive Elements */
+@keyframes cursorPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
 }
 
 /* Hide default cursor on interactive elements */
 @media (pointer: fine) {
   body {
-    cursor: none;
+    cursor: none !important;
   }
   
-  a, button, [data-magnetic], [data-card], input, textarea, select, [role="button"] {
-    cursor: none;
+  a, button, [data-magnetic], [data-card], input, textarea, select, [role="button"], 
+  .cursor-pointer, [onclick] {
+    cursor: none !important;
+  }
+  
+  /* Ensure cursor is hidden on all clickable elements */
+  * {
+    cursor: none !important;
   }
 }
 
 /* Show default cursor on mobile */
 @media (pointer: coarse) {
-  .custom-cursor {
-    display: none;
+  .custom-cursor-container {
+    display: none !important;
   }
   
-  body {
-    cursor: auto;
+  body, * {
+    cursor: auto !important;
+  }
+}
+
+/* Performance optimizations */
+.cursor-dot,
+.cursor-ring,
+.cursor-trail {
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+/* Smooth transitions */
+.cursor-dot-inner,
+.cursor-ring,
+.cursor-ring-glow {
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Enhanced glow effect on hover */
+.cursor-ring:hover .cursor-ring-glow {
+  opacity: 0.8;
+  animation: cursorPulse 2s ease-in-out infinite;
+}
+
+/* Text selection cursor */
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: inherit;
+}
+
+::-moz-selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: inherit;
+}
+
+
+/* ===== SMOOTH PAGE TRANSITIONS ===== */
+
+/* All sections get smooth transitions */
+section {
+  transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+              transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Smooth transitions for all interactive elements */
+a, button, input, textarea, select {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Smooth hover states */
+a:hover, button:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth focus states */
+input:focus, textarea:focus, select:focus {
+  transform: scale(1.01);
+}
+
+/* Perfect page load animation */
+@keyframes pageLoad {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main {
+  animation: pageLoad 1.2s cubic-bezier(0.43, 0.13, 0.23, 0.96) forwards;
+}
+
+/* Hero elements start hidden for perfect animation */
+[data-hero-badge],
+[data-hero-title],
+[data-hero-subtitle],
+[data-hero-card],
+[data-hero-feature] {
+  opacity: 0;
+}
+
+/* After animation, ensure visibility */
+[data-hero-badge].animated,
+[data-hero-title].animated,
+[data-hero-subtitle].animated,
+[data-hero-card].animated,
+[data-hero-feature].animated {
+  opacity: 1;
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+img[loading="lazy"] {
+  opacity: 0;
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Smooth card hover */
+[data-card]:hover {
+  transform: translateY(-4px) scale(1.02);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Smooth button press */
+button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* Smooth link underline */
+a {
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* Remove underline from buttons and nav links */
+button::after,
+nav a::after {
+  display: none;
+}
+
+/* Smooth modal/dialog transitions */
+dialog {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+dialog[open] {
+  animation: dialogFadeIn 0.3s ease forwards;
+}
+
+@keyframes dialogFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Smooth tooltip transitions */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Smooth skeleton loading */
+@keyframes skeleton {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  animation: skeleton 1.5s ease-in-out infinite;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+}
+
+/* Smooth progress bar */
+.progress-bar {
+  transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Smooth accordion */
+.accordion-content {
+  transition: max-height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 0.4s ease;
+}
+
+/* Smooth tab transitions */
+.tab-content {
+  animation: tabFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes tabFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

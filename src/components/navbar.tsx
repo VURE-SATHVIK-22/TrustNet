@@ -10,7 +10,7 @@ import {
   Shield, Menu, X, Sparkles, Search, Bell, Sun, Moon, 
   ChevronDown, Zap, Brain, Eye, Lock, BarChart3, FileText,
   Users, Settings, HelpCircle, Command, QrCode, Mail, Link as LinkIcon,
-  LogIn, UserPlus
+  LogIn, UserPlus, ShieldCheck, UserCheck, CreditCard, MessageSquare, Image
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -60,7 +60,7 @@ const MagneticNavItem = ({
   const content = (
     <motion.div
       ref={itemRef}
-      className={`relative px-4 py-2 rounded-lg transition-all duration-300 cursor-pointer ${
+      className={`relative px-3 py-2 rounded-lg transition-all duration-300 cursor-pointer flex items-center ${
         isActive 
           ? 'bg-gradient-to-r from-blue-500/10 to-indigo-500/10 text-blue-600' 
           : 'text-gray-700 hover:text-blue-600'
@@ -418,6 +418,14 @@ const scanMenuItems = [
   { name: "Link Analyzer", description: "Check suspicious URLs", icon: LinkIcon, href: "/scan/link" },
 ]
 
+const quantumGuardMenuItems = [
+  { name: "Digital Trust Score Analyzer", description: "Analyze any digital identity", icon: ShieldCheck, href: "/quantumguard/trust-score" },
+  { name: "Identity Checker", description: "Email / Phone / Username", icon: UserCheck, href: "/quantumguard/identity-checker" },
+  { name: "UPI / Payment Risk Scanner", description: "Verify payment identities", icon: CreditCard, href: "/quantumguard/upi-scanner" },
+  { name: "WhatsApp / SMS Scam Analyzer", description: "Detect message manipulation", icon: MessageSquare, href: "/quantumguard/message-analyzer" },
+  { name: "Screenshot Authenticity Checker", description: "Verify screenshot legitimacy", icon: Image, href: "/quantumguard/screenshot-checker" },
+]
+
 const megaMenuItems = {
   resources: [
     { name: "Documentation", description: "API and integration guides", icon: FileText, href: "/docs" },
@@ -538,51 +546,53 @@ export function Navbar() {
       {/* Scroll Progress Bar */}
       <motion.div
         ref={progressRef}
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 z-50 origin-left"
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 z-[10000] origin-left"
         style={{ scaleX: scrollProgress / 100 }}
       />
 
       <nav
         ref={navRef}
-        className={`fixed top-0 z-40 w-full transition-all duration-500 ${
+        className={`fixed top-0 z-[9999] w-full transition-all duration-500 ${
           scrolled 
             ? 'bg-white/90 backdrop-blur-xl shadow-2xl border-b border-white/20' 
-            : 'bg-transparent'
+            : 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100'
         }`}
       >
         {/* Animated gradient border */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500" />
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex h-20 items-center justify-between">
-            {/* Advanced Logo */}
-            <Link href="/" className="nav-item">
-              <AdvancedLogo scrolled={scrolled} />
-            </Link>
+            {/* Logo - Fixed width to prevent shifting */}
+            <div className="flex-shrink-0 nav-item">
+              <Link href="/">
+                <AdvancedLogo scrolled={scrolled} />
+              </Link>
+            </div>
             
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-1">
+            {/* Desktop Navigation - Centered */}
+            <div className="hidden lg:flex items-center justify-center flex-1 space-x-1 px-4">
               {navItems.map((item) => (
                 <MagneticNavItem
                   key={item.name}
                   href={item.href}
                   isActive={pathname === item.href}
-                  className="nav-item"
+                  className="nav-item whitespace-nowrap"
                 >
-                  <item.icon className="w-4 h-4 mr-2" />
+                  <item.icon className="w-4 h-4 mr-1.5" />
                   {item.name}
                 </MagneticNavItem>
               ))}
               
               {/* Scan Tools Mega Menu */}
               <div 
-                className="relative"
+                className="relative whitespace-nowrap"
                 onMouseEnter={() => handleMegaMenuEnter('scan')}
                 onMouseLeave={handleMegaMenuLeave}
               >
                 <MagneticNavItem className="nav-item">
                   <span className="flex items-center">
-                    <Zap className="w-4 h-4 mr-2" />
+                    <Zap className="w-4 h-4 mr-1.5" />
                     Scan Tools
                     <ChevronDown className="w-4 h-4 ml-1" />
                   </span>
@@ -616,37 +626,82 @@ export function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* QuantumGuard Mega Menu */}
+              <div 
+                className="relative whitespace-nowrap"
+                onMouseEnter={() => handleMegaMenuEnter('quantumguard')}
+                onMouseLeave={handleMegaMenuLeave}
+              >
+                <MagneticNavItem className="nav-item">
+                  <span className="flex items-center">
+                    <ShieldCheck className="w-4 h-4 mr-1.5" />
+                    QuantumGuard
+                    <ChevronDown className="w-4 h-4 ml-1" />
+                  </span>
+                </MagneticNavItem>
+                
+                <AnimatePresence>
+                  {megaMenuOpen === 'quantumguard' && (
+                    <motion.div
+                      className="absolute top-full left-0 mt-2 w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-6"
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="mb-4 pb-4 border-b border-gray-200">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-1">QuantumGuard AI</h3>
+                        <p className="text-xs text-gray-500">Universal Digital Trust Score System</p>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {quantumGuardMenuItems.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all group"
+                          >
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors">
+                              <item.icon className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium text-sm text-gray-900">{item.name}</div>
+                              <div className="text-xs text-gray-500">{item.description}</div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {/* Action Items */}
-            <div className="flex items-center space-x-4">
-              {/* Search */}
+            {/* Action Items - Right Side */}
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              {/* Search Icon */}
               <motion.button
                 onClick={() => setSearchOpen(true)}
-                className="nav-action hidden md:flex items-center space-x-2 px-3 py-2 bg-gray-100/80 hover:bg-gray-200/80 rounded-lg transition-colors text-sm text-gray-600"
-                whileHover={{ scale: 1.05 }}
+                className="nav-action hidden md:flex p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
+                title="Search (Ctrl+K)"
               >
-                <Search className="w-4 h-4" />
-                <span>Search</span>
-                <div className="flex items-center space-x-1 text-xs bg-white/80 px-2 py-1 rounded">
-                  <Command className="w-3 h-3" />
-                  <span>K</span>
-                </div>
+                <Search className="w-5 h-5" />
               </motion.button>
 
               {/* Notifications */}
-              <div className="nav-action">
+              <div className="nav-action hidden md:block">
                 <NotificationBadge />
               </div>
 
               {/* Theme Toggle */}
-              <div className="nav-action">
+              <div className="nav-action hidden md:block">
                 <ThemeToggle />
               </div>
 
-              {/* Login Button */}
-              <motion.div className="nav-action">
+              {/* Login Button - Desktop */}
+              <motion.div className="nav-action hidden lg:block">
                 <Link href="/login">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -654,30 +709,32 @@ export function Navbar() {
                   >
                     <Button 
                       variant="outline"
-                      className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
+                      size="sm"
+                      className="border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 whitespace-nowrap"
                     >
-                      <LogIn className="w-4 h-4 mr-2" />
+                      <LogIn className="w-4 h-4 mr-1.5" />
                       Login
                     </Button>
                   </motion.div>
                 </Link>
               </motion.div>
 
-              {/* Sign Up Button */}
-              <motion.div className="nav-action">
+              {/* Sign Up Button - Desktop */}
+              <motion.div className="nav-action hidden lg:block">
                 <Link href="/signup">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Button 
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group whitespace-nowrap"
                     >
                       {/* Animated background */}
                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       
                       <span className="relative flex items-center">
-                        <UserPlus className="w-4 h-4 mr-2" />
+                        <UserPlus className="w-4 h-4 mr-1.5" />
                         Sign Up
                       </span>
                       
@@ -691,7 +748,7 @@ export function Navbar() {
               {/* Mobile Menu Button */}
               <motion.button
                 onClick={toggleMenu}
-                className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+                className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors ml-2"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -739,12 +796,32 @@ export function Navbar() {
                       </motion.div>
                     ))}
                     
+                    {/* Mobile Login/Signup Buttons */}
                     <motion.div 
-                      className="pt-4 border-t border-gray-200/60"
+                      className="pt-4 border-t border-gray-200/60 space-y-3"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
                     >
+                      <Link href="/login" onClick={() => setIsOpen(false)}>
+                        <Button 
+                          variant="outline"
+                          className="w-full border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Login
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/signup" onClick={() => setIsOpen(false)}>
+                        <Button 
+                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all duration-300"
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Sign Up
+                        </Button>
+                      </Link>
+                      
                       <Button 
                         onClick={() => {
                           const scannerSection = document.getElementById('scanner')
@@ -753,7 +830,8 @@ export function Navbar() {
                           }
                           setIsOpen(false)
                         }}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all duration-300"
+                        variant="ghost"
+                        className="w-full text-gray-600 hover:text-blue-600 hover:bg-gray-50"
                       >
                         <Sparkles className="w-4 h-4 mr-2" />
                         Get Started

@@ -2,10 +2,9 @@
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SplitText } from 'gsap/SplitText'
 
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, SplitText)
+  gsap.registerPlugin(ScrollTrigger)
 }
 
 export class ScrollAnimations {
@@ -59,6 +58,8 @@ export class ScrollAnimations {
             start: 'top 85%',
             end: 'top 60%',
             toggleActions: 'play none none reverse',
+            onEnter: () => element.classList.add('animated'),
+            onLeaveBack: () => element.classList.remove('animated')
           }
         }
       )

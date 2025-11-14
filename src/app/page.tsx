@@ -8,6 +8,7 @@ import { advancedMLEngine, type AdvancedScanResult } from "@/lib/advanced-ml-eng
 import { GSAPAnimations } from "@/lib/gsap-animations"
 import { Brain, Calendar, Code, FileText, Clock } from "lucide-react"
 import { HeroGeometric } from "@/components/ui/shape-landing-hero"
+import { QuantumGuardSection } from "@/components/QuantumGuardSection"
 
 // Lazy load heavy components for better performance
 const AnimatedHero = lazy(() => import("@/components/ui/animated-hero").then(m => ({ default: m.AnimatedHero })))
@@ -224,19 +225,19 @@ export default function Home() {
       step: 'Step 1',
       title: 'Input Analysis',
       content: 'Paste any suspicious URL or email content into our advanced AI scanner for immediate analysis.',
-      image: 'https://images.unsplash.com/photo-1563206767-5b18f218e8de?q=80&w=2070&auto=format&fit=crop'
+      image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop'
     },
     {
       step: 'Step 2',
       title: 'AI Processing',
       content: 'Our machine learning models analyze 50+ features including URL structure, content patterns, and emotional manipulation tactics.',
-      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop'
+      image: 'https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=2070&auto=format&fit=crop'
     },
     {
       step: 'Step 3',
       title: 'Instant Results',
       content: 'Get detailed results with trust scores, risk explanations, and actionable insights to protect yourself from phishing attacks.',
-      image: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2070&auto=format&fit=crop'
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop'
     }
   ]
 
@@ -305,7 +306,7 @@ export default function Home() {
       <Suspense fallback={null}>
         <ScrollProgress />
       </Suspense>
-      <main>
+      <main className="relative">
         {/* Geometric Hero Landing */}
         <HeroGeometric 
           badge="🛡️ TrustNet AI Security"
@@ -321,6 +322,9 @@ export default function Home() {
         {/* Original Hero Section */}
         <HeroSection onScan={handleScan} />
         
+        {/* QuantumGuard Section */}
+        <QuantumGuardSection />
+
         {/* Glass Cards Feature Section */}
         <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
           {/* Background effects */}
@@ -344,9 +348,11 @@ export default function Home() {
         </section>
         
         {/* Functional Scan Section */}
-        <Suspense fallback={<LoadingSpinner />}>
-          <ScanSection />
-        </Suspense>
+        <div data-fade-scale>
+          <Suspense fallback={<LoadingSpinner />}>
+            <ScanSection />
+          </Suspense>
+        </div>
         
         {/* How It Works Section */}
         <section className="py-20 bg-gray-50 relative overflow-hidden">
@@ -374,9 +380,11 @@ export default function Home() {
         
         {/* Demo Examples */}
         {!scanResult && (
-          <Suspense fallback={<LoadingSpinner />}>
-            <DemoExamples onTryExample={handleScan} />
-          </Suspense>
+          <div data-fade-scale>
+            <Suspense fallback={<LoadingSpinner />}>
+              <DemoExamples onTryExample={handleScan} />
+            </Suspense>
+          </div>
         )}
         
         {/* Real-time Stats Display */}

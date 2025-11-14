@@ -73,9 +73,9 @@ export function HeroSection({ onScan }: HeroSectionProps) {
   }
 
   return (
-    <div ref={heroRef} className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 min-h-screen flex items-center">
+    <div ref={heroRef} className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 min-h-screen flex items-center z-0">
       {/* Floating Background Elements with Parallax */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="floating-element absolute top-20 left-10 w-20 h-20 bg-blue-100/50 rounded-full blur-xl" data-parallax data-parallax-speed="0.2"></div>
         <div className="floating-element absolute top-40 right-20 w-32 h-32 bg-indigo-100/50 rounded-full blur-xl" data-parallax data-parallax-speed="0.4"></div>
         <div className="floating-element absolute bottom-40 left-20 w-24 h-24 bg-purple-100/50 rounded-full blur-xl" data-parallax data-parallax-speed="0.3"></div>
@@ -84,33 +84,33 @@ export function HeroSection({ onScan }: HeroSectionProps) {
 
       <div className="container mx-auto px-4 py-24 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
-          <div className="mb-8" data-fade-in>
-            <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4 mr-2" data-float />
+          <div className="mb-8">
+            <div 
+              data-hero-badge
+              className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-full text-blue-700 text-sm font-medium mb-6"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
               <span>Advanced AI-Powered Detection</span>
             </div>
           </div>
 
           <h1 
-            ref={titleRef}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-gray-900 mb-8 leading-tight"
+            data-hero-title
+            className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-gray-900 mb-8 leading-tight opacity-0"
           >
-            TrustNet —{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Know Before You Click
-            </span>
+            TrustNet — Know Before You Click
           </h1>
           
           <p
-            ref={subtitleRef}
-            className="mx-auto max-w-3xl text-xl md:text-2xl leading-relaxed text-gray-800 mb-12 font-medium"
+            data-hero-subtitle
+            className="mx-auto max-w-3xl text-xl md:text-2xl leading-relaxed text-gray-800 mb-12 font-medium opacity-0"
           >
             Advanced phishing detection powered by machine learning. 
             <br />
             <span className="text-blue-700 font-semibold">Privacy-first. Real-time. Explainable.</span>
           </p>
 
-          <div ref={cardRef} className="mx-auto max-w-4xl mb-16">
+          <div data-hero-card className="mx-auto max-w-4xl mb-16 opacity-0">
             <Card className="p-8 shadow-2xl border-0 bg-white/90 backdrop-blur-lg relative overflow-hidden">
               <div className="scan-line absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-500 opacity-0"></div>
               <CardContent className="p-0">
@@ -162,9 +162,14 @@ export function HeroSection({ onScan }: HeroSectionProps) {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto" data-cards-stagger>
-            <div className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" data-card data-magnetic data-magnetic-strength="0.15">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 mb-6 group-hover:scale-110 transition-transform duration-300" data-rotate-scroll data-rotate-amount="15">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <div 
+              data-hero-feature
+              className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" 
+              data-magnetic 
+              data-magnetic-strength="0.15"
+            >
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Shield className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Privacy-First Architecture</h3>
@@ -174,8 +179,13 @@ export function HeroSection({ onScan }: HeroSectionProps) {
               </p>
             </div>
             
-            <div className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" data-card data-magnetic data-magnetic-strength="0.15">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-300" data-rotate-scroll data-rotate-amount="15">
+            <div 
+              data-hero-feature
+              className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" 
+              data-magnetic 
+              data-magnetic-strength="0.15"
+            >
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Brain className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Advanced ML Models</h3>
@@ -185,8 +195,13 @@ export function HeroSection({ onScan }: HeroSectionProps) {
               </p>
             </div>
             
-            <div className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" data-card data-magnetic data-magnetic-strength="0.15">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 mb-6 group-hover:scale-110 transition-transform duration-300" data-rotate-scroll data-rotate-amount="15">
+            <div 
+              data-hero-feature
+              className="group p-8 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 hover:bg-white/80 transition-all duration-300" 
+              data-magnetic 
+              data-magnetic-strength="0.15"
+            >
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 mb-6 group-hover:scale-110 transition-transform duration-300">
                 <Eye className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-4">Explainable Results</h3>

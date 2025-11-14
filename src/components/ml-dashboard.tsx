@@ -78,8 +78,8 @@ export function MLDashboard() {
         useMockStats();
       }
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
-      // Use mock data if backend is not available
+      // Silently use mock data if backend is not available
+      // This is expected behavior when ML backend is not running
       useMockStats();
     }
   };
